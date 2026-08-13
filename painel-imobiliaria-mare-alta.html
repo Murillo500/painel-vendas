@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel Comercial · Maré Alta Imóveis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16242B; --ink-2:#41565F; --muted:#7C8E96;
+  --canvas:#E7EAE5; --surface:#FFFFFF; --line:#D6DBD5; --line-soft:#E9ECE7;
+  --blue:#33477F; --blue-2:#4A63A6; --blue-3:#8695C4; --blue-4:#C3CBE2; --blue-5:#222F57;
+  --oxide:#9E3B2E; --amber:#A8681A; --green:#2F6B4F;
+  --r:4px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--canvas);color:var(--ink);
+  font-family:'Public Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  font-size:13px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.num,.mono{font-family:'Azeret Mono',ui-monospace,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+h1,h2{margin:0;font-family:'Bricolage Grotesque','Public Sans',sans-serif;font-weight:600}
+.eyebrow{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:9.5px;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.wrap{max-width:1340px;margin:0 auto;padding:20px 22px 40px}
+
+.topbar{display:flex;align-items:center;gap:15px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+.mark{width:32px;height:32px;border-radius:3px;background:var(--blue-5);flex:none;position:relative;overflow:hidden}
+.mark::before{content:'';position:absolute;left:0;right:0;bottom:0;height:11px;background:var(--oxide)}
+.mark::after{content:'MA';position:absolute;inset:0;display:grid;place-items:center;
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:12px;color:#fff;letter-spacing:.02em}
+.brand h1{font-size:15.5px;letter-spacing:-.015em}
+.brand p{margin:1px 0 0;font-size:11.5px;color:var(--muted)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:9px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:3px;padding:6px 10px;font-size:11.5px;color:var(--ink-2);white-space:nowrap}
+.chip b{font-weight:600;color:var(--ink)}
+.status{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+
+.filters{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:11px 14px;margin-bottom:14px;display:flex;align-items:flex-end;gap:11px;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:9px;
+  text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+select,.search input{font:inherit;font-size:12.5px;color:var(--ink);background:var(--surface);
+  border:1px solid var(--line);border-radius:3px;padding:6px 9px;height:31px;min-width:142px;
+  appearance:none;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%237C8E96' stroke-width='1.4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;background-size:9px;padding-right:26px;cursor:pointer}
+select:focus-visible,input:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--blue-2);outline-offset:1px}
+select.on{border-color:var(--blue-2);background-color:#F4F6FB;color:var(--blue)}
+.btn{font:inherit;font-size:11.5px;height:31px;padding:0 12px;border:1px solid var(--line);
+  background:var(--surface);border-radius:3px;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.btn:hover:not(:disabled){border-color:var(--blue-2);color:var(--blue)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.solid{background:var(--blue-5);border-color:var(--blue-5);color:#fff}
+.btn.solid:hover{color:#fff;opacity:.9}
+.scope{margin-left:auto;text-align:right;font-size:11px;color:var(--muted);line-height:1.5;cursor:help}
+.scope b{color:var(--ink);font-weight:500;font-family:'Azeret Mono',monospace}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#F4F6FB;border:1px solid var(--blue-4);
+  color:var(--blue);border-radius:3px;padding:5px 8px;font-size:11.5px;height:31px}
+.pill button{border:0;background:none;color:var(--blue);cursor:pointer;font:inherit;font-size:14px;line-height:1;padding:0}
+
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;min-width:0}
+.card-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+.card-head h2{font-size:12.5px;letter-spacing:-.01em}
+.card-head .sub{font-size:11px;color:var(--muted);margin-left:auto;text-align:right}
+.hint{border-bottom:1px dotted rgba(124,142,150,.8);cursor:help}
+
+.hero{grid-column:span 12;display:grid;grid-template-columns:minmax(0,1fr) 250px}
+.hero-main{padding-right:26px}
+.hero-value{display:flex;align-items:flex-end;gap:11px;margin:6px 0 2px;flex-wrap:wrap}
+.hero-value .cur{font-size:19px;color:var(--muted);padding-bottom:6px}
+.hero-value .v{font-size:52px;font-weight:500;line-height:1}
+.hero-value .pct{margin-left:auto;font-size:13px;color:var(--ink-2);padding-bottom:7px}
+.hero-value .pct b{font-family:'Azeret Mono',monospace;font-size:17px;font-weight:600;color:var(--blue)}
+.rail{margin-top:18px;position:relative}
+.rail-months{position:relative;height:15px}
+.mk{position:absolute;top:0;transform:translateX(-50%);font-size:9.5px;color:var(--muted);font-family:'Azeret Mono',monospace}
+.rail-bar{position:relative;height:15px;background:var(--line-soft);border-radius:2px;overflow:hidden}
+.rail-fill{position:absolute;left:0;top:0;bottom:0;background:var(--blue);width:0;transition:width .9s cubic-bezier(.22,.7,.3,1)}
+.rail-seg{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.5)}
+.rail-gap{position:absolute;top:0;bottom:0;right:0;width:0;background:repeating-linear-gradient(135deg,#F3F5F1 0 4px,#E4E8E3 4px 8px)}
+.rail-meta{position:absolute;top:-4px;bottom:-4px;right:0;width:2px;background:var(--ink)}
+.rail-hits{position:absolute;left:0;right:0;top:15px;height:15px;z-index:2}
+.rail-hits i{position:absolute;top:-4px;bottom:-4px;cursor:help}
+.rail-legend{display:flex;gap:14px;margin-top:7px;font-size:11px;color:var(--muted)}
+.rail-legend .r{margin-left:auto;text-align:right}
+.rail-legend b{color:var(--ink);font-weight:500}
+.hero-side{border-left:1px solid var(--line);padding-left:22px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.delta .l{font-size:11px;color:var(--muted);margin-bottom:2px}
+.delta .n{font-size:17px;font-weight:500}
+.delta .n small{font-size:11px;color:var(--muted);font-weight:400;margin-left:6px;font-family:'Public Sans',sans-serif}
+.up{color:var(--green)} .down{color:var(--oxide)}
+
+.kpi{grid-column:span 3;padding:14px 16px}
+.kpi .v{font-size:26px;font-weight:500;line-height:1.05;margin-top:9px}
+.kpi .v small{font-size:14px;color:var(--muted);margin-left:2px}
+.kpi .f{margin-top:7px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.kpi .f b{font-weight:500;font-family:'Azeret Mono',monospace}
+.spark{height:3px;background:var(--line-soft);border-radius:2px;flex:1;overflow:hidden}
+.spark i{display:block;height:100%;background:var(--blue-3);transition:width .6s}
+
+.estoque{grid-column:span 12}
+.comb-wrap{position:relative;margin-top:4px}
+.comb{position:relative;height:86px;border-bottom:1px solid var(--line)}
+.comb-band{position:absolute;top:0;bottom:0;border-right:1px dashed var(--line);cursor:pointer}
+.comb-band:last-child{border-right:0}
+.comb-band.sel{background:#F4F6FB}
+.comb-band:hover{background:#F7F8F5}
+.tick{position:absolute;bottom:0;width:2px;border-radius:1px;pointer-events:none;transition:opacity .2s}
+.comb-axis{position:relative;height:16px;margin-top:5px}
+.comb-axis span{position:absolute;transform:translateX(-50%);font-size:9.5px;color:var(--muted);font-family:'Azeret Mono',monospace}
+.bands{display:grid;grid-template-columns:repeat(5,1fr);margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.band{padding:0 14px;border-right:1px solid var(--line-soft);cursor:pointer}
+.band:first-child{padding-left:0} .band:last-child{border-right:0;padding-right:0}
+.band .lbl{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;margin-bottom:5px}
+.band .sw{width:8px;height:8px;border-radius:2px;flex:none}
+.band .n{font-size:19px;font-weight:500;line-height:1.1}
+.band .n small{font-size:11px;color:var(--muted);font-weight:400;margin-left:4px;font-family:'Public Sans',sans-serif}
+.band .vgv{font-size:11px;color:var(--muted);margin-top:3px;font-family:'Azeret Mono',monospace}
+.band:hover .lbl{color:var(--blue)}
+.band.sel .lbl{color:var(--blue)}
+
+.c-mes{grid-column:span 8}.c-funil{grid-column:span 4}
+.c-rank{grid-column:span 8}.c-side{grid-column:span 4;display:flex;flex-direction:column;gap:14px}
+.c-bairro{grid-column:span 12}.c-tab{grid-column:span 12}
+.toggle{display:flex;border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-left:auto}
+.toggle button{font:inherit;font-size:11px;padding:4px 11px;border:0;background:var(--surface);color:var(--muted);
+  cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.toggle button[aria-pressed="true"]{background:var(--blue-5);color:#fff}
+svg{display:block;width:100%;height:auto}
+.gl{stroke:var(--line-soft);stroke-width:1}
+.ax{font-family:'Azeret Mono',monospace;font-size:9.5px;fill:var(--muted)}
+.meta-line{stroke:var(--ink);stroke-width:1;stroke-dasharray:3 3;opacity:.5}
+.bar{fill:var(--blue-3);transition:y .5s cubic-bezier(.22,.7,.3,1),height .5s cubic-bezier(.22,.7,.3,1),fill .15s}
+.bar.hi{fill:var(--blue)} .bar.on{fill:var(--blue-5)}
+
+.funil li{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--line-soft);cursor:help}
+.funil li:last-child{border-bottom:0}
+.funil .stage{width:74px;flex:none;font-size:11.5px}
+.funil .barw{flex:1;height:22px;background:var(--line-soft);border-radius:2px;overflow:hidden}
+.funil .barw i{display:block;height:100%;background:var(--blue-2);width:0;transition:width .7s cubic-bezier(.22,.7,.3,1)}
+.funil .barw i.s2{background:var(--blue)} .funil .barw i.s3{background:var(--blue-5)}
+.funil .n{width:56px;text-align:right;font-family:'Azeret Mono',monospace;font-size:13px;font-weight:500}
+.conv{display:flex;align-items:center;gap:8px;padding:5px 0 5px 85px;font-size:10.5px;color:var(--muted)}
+.conv b{font-family:'Azeret Mono',monospace;color:var(--ink-2);font-weight:500}
+
+ul{list-style:none;margin:0;padding:0}
+.blist li{padding:7px 0;border-bottom:1px solid var(--line-soft);cursor:pointer}
+.blist li:last-child{border-bottom:0}
+.blist li:hover .nm{color:var(--blue)}
+.blist .row{display:flex;align-items:baseline;gap:8px;margin-bottom:5px}
+.blist .nm{font-size:12px}
+.blist .val{margin-left:auto;font-family:'Azeret Mono',monospace;font-size:12px;font-weight:500}
+.blist .pc{font-size:10.5px;color:var(--muted);font-family:'Azeret Mono',monospace;width:38px;text-align:right}
+.track{height:5px;background:var(--line-soft);border-radius:3px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--blue-2);width:0;transition:width .7s cubic-bezier(.22,.7,.3,1)}
+
+table{width:100%;border-collapse:collapse}
+th{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--muted);text-align:left;padding:0 10px 8px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+th.r,td.r{text-align:right;padding-right:0}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--blue)}
+th .ar{opacity:0;margin-left:4px;font-size:8px}
+th.sorted{color:var(--ink)} th.sorted .ar{opacity:1}
+td{padding:9px 10px 9px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px;vertical-align:middle}
+tbody tr:hover td{background:#F7F8FB}
+tr.total td{border-bottom:0;border-top:1px solid var(--line);font-weight:600;padding-top:11px}
+.who{display:flex;align-items:center;gap:9px}
+.av{width:24px;height:24px;border-radius:3px;flex:none;display:grid;place-items:center;background:#EEF1F8;
+  color:var(--blue);font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:9.5px}
+td .sec{color:var(--muted);font-size:11.5px}
+.metacell{display:flex;align-items:center;gap:9px;justify-content:flex-end}
+.metabar{position:relative;width:74px;height:5px;background:var(--line-soft);border-radius:3px;overflow:hidden}
+.metabar i{position:absolute;left:0;top:0;bottom:0;background:var(--blue-2);width:0;transition:width .7s}
+.metabar i.under{background:var(--amber)} .metabar i.over{background:var(--green)}
+.metatick{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--ink-2);opacity:.55}
+.muted{color:var(--muted)}
+.tag{display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:3px;background:var(--line-soft);color:var(--ink-2);white-space:nowrap}
+.tag.neg{background:#FBF2E6;color:var(--amber)}
+.age{display:inline-flex;align-items:center;gap:6px;justify-content:flex-end}
+.age i{width:7px;height:7px;border-radius:2px;flex:none}
+
+.tabs{display:flex;border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.tabs button{font:inherit;font-size:11px;padding:5px 13px;border:0;background:var(--surface);color:var(--muted);
+  cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.tabs button[aria-selected="true"]{background:var(--blue-5);color:#fff}
+.tbar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.search input{min-width:220px;background-image:none;padding-right:9px;cursor:text}
+.tfoot{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:11.5px;color:var(--muted)}
+.pager{margin-left:auto;display:flex;align-items:center;gap:6px}
+.pager .btn{height:27px;padding:0 10px;font-size:11px}
+.empty{text-align:center;padding:34px 10px;color:var(--muted)}
+.empty p{margin:0 0 12px}
+
+.alert li{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--line-soft)}
+.alert li:last-child{border-bottom:0;padding-bottom:0}
+.alert li:first-child{padding-top:0}
+.tick2{width:2px;border-radius:2px;flex:none;background:var(--muted)}
+.tick2.hi{background:var(--oxide)} .tick2.md{background:var(--amber)}
+.alert .t{font-size:12.5px;font-weight:500;margin-bottom:2px}
+.alert .d{font-size:11px;color:var(--muted)}
+.alert .n{margin-left:auto;text-align:right;font-family:'Azeret Mono',monospace;font-size:13px;font-weight:500;white-space:nowrap}
+
+.bairros{display:grid;grid-template-columns:repeat(6,1fr)}
+.bairro{padding:0 16px;border-right:1px solid var(--line);cursor:pointer}
+.bairro:first-child{padding-left:0} .bairro:last-child{border-right:0;padding-right:0}
+.bairro:hover .nm{color:var(--blue)}
+.bairro .nm{font-size:12px;font-weight:500;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bairro .v{font-size:18px;font-weight:500;line-height:1.1}
+.bairro .meta{display:flex;align-items:center;gap:8px;margin-top:9px;font-size:10.5px;color:var(--muted)}
+.bairro .track{flex:1}
+
+.gt{position:fixed;left:0;top:0;z-index:60;pointer-events:none;opacity:0;
+  transform:translate(-50%,-100%);background:var(--ink);color:#fff;border-radius:4px;
+  padding:9px 11px;font-size:11.5px;line-height:1.5;max-width:310px;
+  box-shadow:0 8px 22px rgba(22,36,43,.24);transition:opacity .12s}
+.gt.on{opacity:1}
+.gt.below{transform:translate(-50%,0)}
+.gt::after{content:'';position:absolute;left:var(--ax,50%);transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:var(--ink);bottom:-10px}
+.gt.below::after{bottom:auto;top:-10px;border-top-color:transparent;border-bottom-color:var(--ink)}
+.gt h4{margin:0 0 5px;font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:600;letter-spacing:.02em}
+.gt .big{font-family:'Azeret Mono',monospace;font-size:15px;font-weight:500;margin:0 0 6px;letter-spacing:-.03em}
+.gt .r{display:flex;gap:16px;justify-content:space-between;padding:1.5px 0}
+.gt .r span{color:#9FB0B8}
+.gt .r b{font-family:'Azeret Mono',monospace;font-weight:500;white-space:nowrap}
+.gt .n{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.16);color:#9FB0B8;font-size:10.5px;line-height:1.45}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(10px);background:var(--ink);color:#fff;
+  padding:9px 16px;border-radius:4px;font-size:12px;opacity:0;pointer-events:none;transition:all .2s;z-index:20}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.foot{margin-top:16px;display:flex;gap:14px;font-size:11px;color:var(--muted);flex-wrap:wrap}
+
+@media (max-width:1080px){
+  .kpi{grid-column:span 6}.c-mes,.c-funil,.c-rank,.c-side{grid-column:span 12}
+  .hero{grid-template-columns:1fr}.hero-main{padding-right:0}
+  .hero-side{border-left:0;border-top:1px solid var(--line);padding-left:0;padding-top:16px;margin-top:18px;flex-direction:row;gap:26px}
+  .scope{margin-left:0;text-align:left;width:100%}
+  .bairros{grid-template-columns:repeat(3,1fr);row-gap:16px}
+  .bairro{border-right:0;padding:0 14px}.bairro:nth-child(3n+1){padding-left:0}
+  .bands{grid-template-columns:repeat(3,1fr);row-gap:14px}
+  .band{border-right:0;padding:0 12px}.band:nth-child(3n+1){padding-left:0}
+}
+@media (max-width:680px){
+  .wrap{padding:14px}.kpi{grid-column:span 12}.hero-value .v{font-size:36px}
+  .bairros{grid-template-columns:1fr 1fr}.bairro:nth-child(3n+1){padding-left:14px}.bairro:nth-child(odd){padding-left:0}
+  .bands{grid-template-columns:1fr 1fr}.band:nth-child(3n+1){padding-left:12px}.band:nth-child(odd){padding-left:0}
+  .topbar{flex-wrap:wrap}.topbar-right{width:100%;margin-left:0}
+  .hide-sm{display:none}select{min-width:0;width:100%}.field{flex:1 1 46%}
+  .c-tab{overflow-x:auto}.comb{height:64px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topbar">
+    <div class="mark"></div>
+    <div class="brand">
+      <h1>Maré Alta Imóveis</h1>
+      <p>Painel comercial · Salvador e Região Metropolitana</p>
+    </div>
+    <div class="topbar-right">
+      <div class="chip">Período <b>Jan–Jul 2026</b></div>
+      <div class="chip hide-sm">Carteira <b id="baseLbl">—</b></div>
+      <div class="status"><i class="dot"></i> Atualizado 01/08, 07h10</div>
+    </div>
+  </header>
+
+  <section class="filters">
+    <div class="field"><label for="fCorr">Corretor</label>
+      <select id="fCorr"><option value="">Todos</option></select></div>
+    <div class="field"><label for="fBairro">Bairro</label>
+      <select id="fBairro"><option value="">Todos</option></select></div>
+    <div class="field"><label for="fTipo">Tipo</label>
+      <select id="fTipo"><option value="">Todos</option></select></div>
+    <div class="field"><label for="fFaixa">Faixa de preço</label>
+      <select id="fFaixa"><option value="">Todas</option></select></div>
+    <div id="pillWrap"></div>
+    <button class="btn" id="btnClear" disabled>Limpar filtros</button>
+    <div class="scope" id="scope"></div>
+  </section>
+
+  <div class="grid">
+
+    <section class="card hero">
+      <div class="hero-main">
+        <div class="eyebrow hint" id="heroEyebrow" tabindex="0" data-tip="<h4>VGV vendido</h4><div class='n' style='margin:0;padding:0;border:0'>Valor Geral de Vendas: soma do preço de fechamento dos contratos assinados no período. Distratos já estão descontados. Não inclui locação.</div>">VGV vendido · Jan–Jul 2026</div>
+        <div class="hero-value">
+          <span class="cur">R$</span>
+          <span class="v num" id="heroValue">0</span>
+          <span class="pct" id="heroPctWrap"></span>
+        </div>
+        <div class="rail">
+          <div class="rail-months" id="railMonths"></div>
+          <div class="rail-hits" id="railHits"></div>
+          <div class="rail-bar">
+            <div class="rail-gap" id="railGap"></div>
+            <div class="rail-fill" id="railFill"></div>
+            <div class="rail-meta"></div>
+          </div>
+          <div class="rail-legend">
+            <div>Acumulado mês a mês · as divisões claras são os fechamentos mensais</div>
+            <div class="r"><span class="hint" id="metaTip" tabindex="0">Meta <b class="num" id="metaLbl"></b> · <span id="gapLbl"></span></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-side">
+        <div class="delta"><div class="l">Comissão bruta gerada</div><div class="n num" id="dCom">—</div></div>
+        <div class="delta"><div class="l">Vendas fechadas</div><div class="n num" id="dVendas">—</div></div>
+        <div class="delta"><div class="l">Melhor mês</div><div class="n num" id="dMelhor">—</div></div>
+      </div>
+    </section>
+
+    <section class="card kpi"><span class="eyebrow hint" id="kTicketL" tabindex="0">Ticket médio</span>
+      <div class="v num" id="kTicket">—</div><div class="f" id="kTicketF"></div></section>
+    <section class="card kpi"><span class="eyebrow hint" id="kTempoL" tabindex="0">Tempo médio de venda</span>
+      <div class="v num" id="kTempo">—</div><div class="f" id="kTempoF"></div></section>
+    <section class="card kpi"><span class="eyebrow hint" id="kDescL" tabindex="0">Desconto na negociação</span>
+      <div class="v num" id="kDesc">—</div><div class="f" id="kDescF"></div></section>
+    <section class="card kpi"><span class="eyebrow hint" id="kConvL" tabindex="0">Conversão visita → venda</span>
+      <div class="v num" id="kConv">—</div><div class="f" id="kConvF"></div></section>
+
+    <section class="card estoque">
+      <div class="card-head">
+        <h2 class="hint" tabindex="0" data-tip="<h4>Régua de estoque</h4><div class='n' style='margin:0;padding:0;border:0'>Cada traço é um imóvel ainda em carteira, posicionado pelo tempo desde a captação. A altura do traço acompanha o valor pedido. Clique numa faixa para filtrar o painel inteiro por ela.</div>">Régua de estoque · há quanto tempo cada imóvel está parado</h2>
+        <div class="sub">clique numa faixa para filtrar</div>
+      </div>
+      <div class="comb-wrap">
+        <div class="comb" id="comb"></div>
+        <div class="comb-axis" id="combAxis"></div>
+      </div>
+      <div class="bands" id="bands"></div>
+    </section>
+
+    <section class="card c-mes">
+      <div class="card-head"><h2 class="hint" tabindex="0" data-tip="<h4>Fechamentos por mês</h4><div class='n' style='margin:0;padding:0;border:0'>A data considerada é a da assinatura do contrato de compra e venda, não a da proposta. A linha tracejada é a meta mensal do recorte.</div>">Fechamentos por mês</h2>
+        <div class="toggle" role="group" aria-label="Unidade">
+          <button id="btnVgv" aria-pressed="true">VGV</button>
+          <button id="btnQtd" aria-pressed="false">Unidades</button>
+        </div>
+      </div>
+      <div><svg id="mensal" viewBox="0 0 900 250" role="img" aria-label="Fechamentos por mês"></svg></div>
+    </section>
+
+    <section class="card c-funil">
+      <div class="card-head"><h2 class="hint" tabindex="0" data-tip="<h4>Funil comercial</h4><div class='n' style='margin:0;padding:0;border:0'>Visitas realizadas no período, propostas registradas no CRM e contratos assinados. Um mesmo imóvel pode receber várias visitas e mais de uma proposta.</div>">Funil comercial</h2></div>
+      <ul class="funil" id="funil"></ul>
+    </section>
+
+    <section class="card c-rank">
+      <div class="card-head"><h2 class="hint" tabindex="0" data-tip="<h4>Desempenho da equipe</h4><div class='n' style='margin:0;padding:0;border:0'>Ordenado por VGV vendido. A marca vertical na barra é a meta cheia do período. Verde passou de 100%, âmbar está abaixo de 90%. Captações são imóveis que o corretor trouxe para a carteira.</div>">Desempenho da equipe</h2><div class="sub">clique na linha para filtrar</div></div>
+      <table>
+        <thead><tr>
+          <th>Corretor</th><th class="r">VGV vendido</th><th class="r">Part.</th>
+          <th class="r" style="width:170px">Atingimento</th><th class="r">Vendas</th><th class="r">Captações</th><th class="r">Comissão</th>
+        </tr></thead>
+        <tbody id="rankBody"></tbody>
+      </table>
+    </section>
+
+    <div class="c-side">
+      <section class="card">
+        <div class="card-head"><h2 class="hint" tabindex="0" data-tip="<h4>Tipo de imóvel</h4><div class='n' style='margin:0;padding:0;border:0'>Participação de cada tipo no VGV vendido do recorte. A barra é proporcional ao maior tipo, não à meta.</div>">Tipo de imóvel</h2><div class="sub">clique para filtrar</div></div>
+        <ul class="blist" id="tipos"></ul>
+      </section>
+      <section class="card">
+        <div class="card-head"><h2 class="hint" tabindex="0" data-tip="<h4>Pontos de atenção</h4><div class='n' style='margin:0;padding:0;border:0'>Regras fixas recalculadas sobre o recorte filtrado. Passe o mouse em cada linha para ver o critério.</div>">Pontos de atenção</h2><div class="sub">no recorte filtrado</div></div>
+        <ul class="alert" id="alertas"></ul>
+      </section>
+    </div>
+
+    <section class="card c-bairro">
+      <div class="card-head"><h2 class="hint" tabindex="0" data-tip="<h4>Bairros</h4><div class='n' style='margin:0;padding:0;border:0'>Os seis bairros com maior VGV vendido no recorte. A barra compara o que já virou venda com o que segue parado em estoque no mesmo bairro.</div>">Bairros com maior giro</h2><div class="sub">clique para filtrar</div></div>
+      <div class="bairros" id="bairros"></div>
+    </section>
+
+    <section class="card c-tab">
+      <div class="tbar">
+        <div class="tabs" role="tablist">
+          <button id="tabEst" role="tab" aria-selected="true">Estoque</button>
+          <button id="tabVen" role="tab" aria-selected="false">Vendas</button>
+        </div>
+        <div class="search"><input id="q" type="search" placeholder="Buscar referência, bairro, corretor…" aria-label="Buscar na tabela"></div>
+        <button class="btn" id="btnCsv" data-tip="<h4>Copiar CSV</h4><div class='n' style='margin:0;padding:0;border:0'>Copia a aba atual já com os filtros, a busca e a ordenação aplicados, separada por ponto e vírgula e com vírgula decimal — pronta para colar no Excel.</div>">Copiar CSV</button>
+        <div class="sub muted" id="tblHint" style="margin-left:auto;font-size:11px"></div>
+      </div>
+      <div style="overflow-x:auto"><table id="tbl"><thead id="tblHead"></thead><tbody id="tblBody"></tbody></table></div>
+      <div id="tblEmpty" class="empty" hidden>
+        <p>Nenhum imóvel para os filtros aplicados.</p>
+        <button class="btn solid" id="btnEmpty">Limpar filtros</button>
+      </div>
+      <div class="tfoot"><span id="tblCount"></span>
+        <div class="pager"><button class="btn" id="prev">Anterior</button>
+          <span class="mono" id="pageLbl"></span>
+          <button class="btn" id="next">Próxima</button></div>
+      </div>
+    </section>
+
+  </div>
+  <div class="foot">
+    <span>Fonte: CRM de vendas · VGV líquido de distratos</span>
+    <span>Metas aprovadas em 18/12/2025</span>
+    <span>Dados fictícios gerados para demonstração</span>
+  </div>
+</div>
+<div class="gt" id="gt" role="tooltip" aria-hidden="true"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   1. BASE SINTÉTICA (determinística)
+   ============================================================ */
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+var R=rng(20260801);
+function pick(a,r){return a[Math.floor(r*a.length)]}
+function wpick(o,r){var e=Object.entries(o),s=e.reduce(function(a,b){return a+b[1]},0),x=r*s;
+  for(var i=0;i<e.length;i++){x-=e[i][1];if(x<=0)return e[i][0]}return e[e.length-1][0]}
+
+var BAIRROS={
+ 'Horto Florestal':1.52,'Vitória':1.48,'Graça':1.34,'Itaigara':1.26,'Caminho das Árvores':1.20,
+ 'Barra':1.14,'Canela':1.08,'Rio Vermelho':1.04,'Pituba':1.00,'Ondina':0.98,
+ 'Patamares':0.96,'Stella Maris':0.92,'Costa Azul':0.88,'Imbuí':0.82,'Brotas':0.68};
+var PESO_BAIRRO={
+ 'Pituba':.13,'Barra':.11,'Rio Vermelho':.10,'Caminho das Árvores':.09,'Imbuí':.08,'Costa Azul':.07,
+ 'Itaigara':.07,'Stella Maris':.06,'Brotas':.06,'Graça':.05,'Patamares':.05,'Canela':.04,
+ 'Ondina':.04,'Horto Florestal':.03,'Vitória':.02};
+var TIPOS={
+ 'Apartamento':{peso:.46,base:520000,dom:130},
+ 'Casa':{peso:.17,base:790000,dom:195},
+ 'Sala comercial':{peso:.13,base:430000,dom:225},
+ 'Terreno':{peso:.10,base:390000,dom:270},
+ 'Cobertura':{peso:.08,base:1620000,dom:245},
+ 'Galpão':{peso:.06,base:1150000,dom:310}};
+var TIPO_PESO={};Object.keys(TIPOS).forEach(function(k){TIPO_PESO[k]=TIPOS[k].peso});
+
+var FAIXAS=[
+ {k:'a',l:'Até R$ 400 mil',min:0,max:400000},
+ {k:'b',l:'R$ 400 a 800 mil',min:400000,max:800000},
+ {k:'c',l:'R$ 800 mil a 1,5 mi',min:800000,max:1500000},
+ {k:'d',l:'Acima de R$ 1,5 mi',min:1500000,max:Infinity}];
+function faixaDe(p){for(var i=0;i<FAIXAS.length;i++)if(p>=FAIXAS[i].min&&p<FAIXAS[i].max)return FAIXAS[i].k;return 'd'}
+
+var IDADES=[
+ {k:'n',l:'Até 60 dias',min:0,max:60,cor:'#2F6B4F',curto:'recém-captado'},
+ {k:'b',l:'61 a 120 dias',min:61,max:120,cor:'#4A63A6',curto:'no ritmo'},
+ {k:'c',l:'121 a 180 dias',min:121,max:180,cor:'#8695C4',curto:'atenção'},
+ {k:'d',l:'181 a 360 dias',min:181,max:360,cor:'#A8681A',curto:'lento'},
+ {k:'e',l:'Mais de 360 dias',min:361,max:99999,cor:'#9E3B2E',curto:'encalhado'}];
+function idadeDe(d){for(var i=0;i<IDADES.length;i++)if(d>=IDADES[i].min&&d<=IDADES[i].max)return IDADES[i].k;return 'e'}
+var IDADE_BY={};IDADES.forEach(function(i){IDADE_BY[i.k]=i});
+
+var CORR=[
+ {id:1,nome:'Adriana Sampaio',    meta:11800000,at:1.11},
+ {id:2,nome:'Rodrigo Sá Barreto', meta:11000000,at:1.04},
+ {id:3,nome:'Luciana Bittencourt',meta:10200000,at:1.00},
+ {id:4,nome:'Marcelo Tavares',    meta:9600000, at:0.96},
+ {id:5,nome:'Patrícia Almeida',   meta:9200000, at:0.93},
+ {id:6,nome:'Fernando Rocha',     meta:8600000, at:0.88},
+ {id:7,nome:'Silvana Menezes',    meta:7800000, at:0.83},
+ {id:8,nome:'Túlio Vasconcelos',  meta:6800000, at:0.74}];
+var CORR_BY={};CORR.forEach(function(c){CORR_BY[c.id]=c});
+var COMISSAO=0.055;
+
+var MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul'];
+var MES_NOME=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho'];
+var SAZON=[.09,.11,.15,.16,.17,.18,.14];
+var LIM_MES=[31,59,90,120,151,181,212];
+var HOJE=213;
+function mesDe(d){for(var i=0;i<7;i++)if(d<=LIM_MES[i])return i;return 6}
+
+var PREF={'Apartamento':'AP','Casa':'CA','Cobertura':'CO','Sala comercial':'SL','Terreno':'TR','Galpão':'GL'};
+var IMOVEIS=[],seq=0;
+for(var i=0;i<372;i++){
+  var tipo=wpick(TIPO_PESO,R()),bairro=wpick(PESO_BAIRRO,R()),T=TIPOS[tipo];
+  var preco=Math.round(T.base*BAIRROS[bairro]*(0.62+R()*0.86)/1000)*1000;
+  var captador=pick(CORR,R()).id;
+  var domBase=T.dom*(0.45+R()*1.5)*(BAIRROS[bairro]>1.2?1.22:1);
+  seq++;
+  IMOVEIS.push({id:seq,ref:PREF[tipo]+'-'+String(1000+seq).slice(1),tipo:tipo,bairro:bairro,preco:preco,
+    captador:captador,domBase:Math.round(domBase),_r:[R(),R(),R(),R()]});
+}
+
+IMOVEIS.forEach(function(im){
+  var r1=im._r[0],r2=im._r[1],r3=im._r[2],r4=im._r[3];
+  var rapido=im.domBase<TIPOS[im.tipo].dom;
+  var chance=rapido?0.42:0.19;
+  if(r1<chance){
+    im.status='Vendido';
+    var mes=0,x=r2,acc=0;
+    for(var j=0;j<7;j++){acc+=SAZON[j];if(x<=acc){mes=j;break}}
+    var ini=mes===0?1:LIM_MES[mes-1]+1,fim=LIM_MES[mes];
+    im.dataVenda=ini+Math.floor(r3*(fim-ini+1));
+    im.mes=mes;
+    im.dias=Math.max(11,Math.round(im.domBase*(0.55+r4*0.6)));
+    im.captacao=im.dataVenda-im.dias;
+    im.desconto=0.015+r4*0.115+(im.dias>200?0.03:0);
+    im.precoVenda=Math.round(im.preco*(1-im.desconto)/1000)*1000;
+    im.comissao=Math.round(im.precoVenda*COMISSAO);
+    im.vendedor=(r3<0.72)?im.captador:pick(CORR,r2).id;
+    im.visitas=2+Math.round(r2*7+im.dias/70);
+    im.propostas=1+Math.round(r4*2);
+    im.ultVisita=null;
+  }else{
+    im.status=(r1<chance+0.085)?'Em negociação':'Disponível';
+    im.dias=Math.max(4,Math.round(Math.pow(r4,1.9)*430+r2*24));
+    im.captacao=HOJE-im.dias;
+    im.visitas=Math.round(r2*5+im.dias/95);
+    im.propostas=im.status==='Em negociação'?1:(r3>0.9?1:0);
+    im.ultVisita=im.visitas>0?Math.round(r3*Math.min(im.dias,150)):null;
+  }
+  im.faixa=faixaDe(im.preco);
+  delete im._r;
+});
+
+/* calibra o VGV por corretor para bater meta × atingimento */
+(function(){
+  var alvo={},real={};
+  CORR.forEach(function(c){alvo[c.id]=c.meta*c.at;real[c.id]=0});
+  IMOVEIS.forEach(function(i){if(i.status==='Vendido')real[i.vendedor]+=i.precoVenda});
+  var esc={};CORR.forEach(function(c){esc[c.id]=alvo[c.id]/(real[c.id]||1)});
+  IMOVEIS.forEach(function(i){
+    if(i.status!=='Vendido')return;
+    var k=esc[i.vendedor];
+    i.preco=Math.round(i.preco*k/1000)*1000;
+    i.precoVenda=Math.round(i.precoVenda*k/1000)*1000;
+    i.comissao=Math.round(i.precoVenda*COMISSAO);
+    i.faixa=faixaDe(i.precoVenda);
+  });
+})();
+var VGV_EMPRESA=IMOVEIS.reduce(function(a,i){return a+(i.status==='Vendido'?i.precoVenda:0)},0);
+
+/* ============================================================
+   2. FILTROS E AGREGAÇÃO
+   ============================================================ */
+var F={corr:'',bairro:'',tipo:'',faixa:'',idade:''};
+function fmt(n){return Math.round(n).toLocaleString('pt-BR')}
+function dec(n,d){d=d===undefined?1:d;return n.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function mi(n){return 'R$ '+dec(n/1000000,1)+' mi'}
+function RS(n){return 'R$ '+fmt(n)}
+function dataBR(d){var m=mesDe(d),ini=m===0?0:LIM_MES[m-1];
+  return String(d-ini).padStart(2,'0')+'/'+String(m+1).padStart(2,'0')+'/26'}
+
+function base(im){return (!F.bairro||im.bairro===F.bairro)&&(!F.tipo||im.tipo===F.tipo)&&(!F.faixa||im.faixa===F.faixa)}
+function passaVenda(im){return im.status==='Vendido'&&base(im)&&(!F.corr||im.vendedor==F.corr)}
+function passaEstoque(im){return im.status!=='Vendido'&&base(im)&&(!F.corr||im.captador==F.corr)&&
+  (!F.idade||idadeDe(im.dias)===F.idade)}
+function metaEscopo(){
+  if(F.bairro||F.tipo||F.faixa||F.idade)return null;
+  return CORR.filter(function(c){return !F.corr||c.id==F.corr}).reduce(function(a,c){return a+c.meta},0);
+}
+
+function agrega(){
+  var V=IMOVEIS.filter(passaVenda),E=IMOVEIS.filter(passaEstoque);
+  var A={V:V,E:E,vgv:0,com:0,n:V.length,dias:0,desc:0,visitas:0,propostas:0,
+    porMes:[0,0,0,0,0,0,0],qtdMes:[0,0,0,0,0,0,0],
+    porBairro:{},porTipo:{},porCorr:{},estBairro:{},estIdade:{},vgvEstoque:0};
+  V.forEach(function(i){
+    A.vgv+=i.precoVenda;A.com+=i.comissao;A.dias+=i.dias;A.desc+=i.desconto;
+    A.visitas+=i.visitas;A.propostas+=i.propostas;
+    A.porMes[i.mes]+=i.precoVenda;A.qtdMes[i.mes]++;
+    A.porBairro[i.bairro]=(A.porBairro[i.bairro]||0)+i.precoVenda;
+    A.porTipo[i.tipo]=(A.porTipo[i.tipo]||0)+i.precoVenda;
+    var c=A.porCorr[i.vendedor]=A.porCorr[i.vendedor]||{vgv:0,n:0,com:0,dias:0,desc:0};
+    c.vgv+=i.precoVenda;c.n++;c.com+=i.comissao;c.dias+=i.dias;c.desc+=i.desconto;
+  });
+  E.forEach(function(i){
+    A.vgvEstoque+=i.preco;
+    A.estBairro[i.bairro]=(A.estBairro[i.bairro]||0)+i.preco;
+    var k=idadeDe(i.dias),b=A.estIdade[k]=A.estIdade[k]||{n:0,v:0,dias:0};
+    b.n++;b.v+=i.preco;b.dias+=i.dias;
+    A.visitas+=i.visitas;A.propostas+=i.propostas;
+  });
+  A.ticket=A.n?A.vgv/A.n:0;
+  A.tmv=A.n?A.dias/A.n:0;
+  A.descM=A.n?A.desc/A.n:0;
+  A.conv=A.visitas?A.n/A.visitas*100:0;
+  return A;
+}
+
+/* ============================================================
+   3. TOOLTIPS
+   ============================================================ */
+var GT=(function(){var e=document.getElementById('gt'),t;
+  return{show:function(html,rect,ax){if(!html)return;
+      e.innerHTML=html;e.setAttribute('aria-hidden','false');e.classList.add('on');
+      var w=e.offsetWidth,h=e.offsetHeight,vw=window.innerWidth;
+      var x=ax!=null?ax:rect.left+rect.width/2,y=rect.top-9,below=false;
+      if(y-h<8){y=rect.bottom+9;below=true}
+      var cx=Math.max(10+w/2,Math.min(vw-10-w/2,x));
+      e.classList.toggle('below',below);
+      e.style.left=cx+'px';e.style.top=y+'px';
+      e.style.setProperty('--ax',(w/2+(x-cx))+'px');clearTimeout(t)},
+    hide:function(){e.classList.remove('on');e.setAttribute('aria-hidden','true')},
+    auto:function(ms){clearTimeout(t);t=setTimeout(function(){GT.hide()},ms)}}})();
+function alvoEl(t){return (t&&t.closest)?t.closest('[data-tip]'):null}
+function ancora(a){var ref=a.dataset.tipAnchor?document.querySelector(a.dataset.tipAnchor):a;
+  return (ref||a).getBoundingClientRect()}
+function abrir(a,tap){if(!a)return;GT.show(a.dataset.tip,ancora(a));if(tap)GT.auto(2800)}
+var atual=null;
+document.addEventListener('mouseover',function(e){var a=alvoEl(e.target);if(a&&a!==atual){atual=a;abrir(a)}});
+document.addEventListener('mouseout',function(e){var d=alvoEl(e.target),p=alvoEl(e.relatedTarget);
+  if(d&&d!==p){atual=null;GT.hide()}});
+document.addEventListener('focusin',function(e){abrir(alvoEl(e.target))});
+document.addEventListener('focusout',function(e){if(alvoEl(e.target))GT.hide()});
+document.addEventListener('touchstart',function(e){abrir(alvoEl(e.target),true)},{passive:true});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')GT.hide()});
+window.addEventListener('scroll',function(){atual=null;GT.hide()},{passive:true,capture:true});
+window.addEventListener('resize',function(){GT.hide()});
+
+function TIP(o){
+  var rows=(o.rows||[]).filter(Boolean).map(function(r){
+    return '<div class="r"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>'}).join('');
+  return '<h4>'+o.t+'</h4>'+(o.big?'<div class="big">'+o.big+'</div>':'')+rows+
+    (o.n?'<div class="n">'+o.n+'</div>':'');
+}
+function ATT(t){return t.replace(/"/g,'&quot;')}
+
+/* ============================================================
+   4. RENDER
+   ============================================================ */
+var modo='vgv',A=null;
+
+function render(){
+  A=agrega();
+  var meta=metaEscopo();
+
+  var ativos=[F.corr,F.bairro,F.tipo,F.faixa,F.idade].filter(Boolean).length;
+  document.getElementById('btnClear').disabled=!ativos;
+  [['fCorr',F.corr],['fBairro',F.bairro],['fTipo',F.tipo],['fFaixa',F.faixa]].forEach(function(p){
+    document.getElementById(p[0]).classList.toggle('on',!!p[1])});
+  document.getElementById('pillWrap').innerHTML=F.idade
+    ?'<div class="field"><label>Tempo em carteira</label><span class="pill">'+IDADE_BY[F.idade].l+
+     ' <button id="pillX" aria-label="Remover filtro de tempo em carteira">×</button></span></div>':'';
+  if(F.idade)document.getElementById('pillX').onclick=function(){setIdade('')};
+
+  var sc=document.getElementById('scope');
+  sc.dataset.tip=TIP({t:'Recorte atual',
+    rows:[['Vendas no período',fmt(A.n)],['Imóveis em carteira',fmt(A.E.length)],
+          ['VGV parado em estoque',mi(A.vgvEstoque)],['Base completa',fmt(IMOVEIS.length)+' imóveis']],
+    n:'As vendas seguem o corretor que fechou. O estoque segue o corretor que captou.'});
+  sc.innerHTML='<b>'+fmt(A.n)+'</b> vendas · <b>'+fmt(A.E.length)+'</b> em carteira · <b>'+mi(A.vgvEstoque)+'</b> parados'+
+    (ativos?'<br>'+ativos+' filtro'+(ativos>1?'s':'')+' aplicado'+(ativos>1?'s':''):'<br>sem filtros · carteira completa');
+  document.getElementById('baseLbl').textContent=fmt(IMOVEIS.length)+' imóveis';
+  var rot=[F.corr?CORR_BY[F.corr].nome:'',F.bairro,F.tipo,
+    F.faixa?FAIXAS.filter(function(f){return f.k===F.faixa})[0].l:''].filter(Boolean);
+  document.getElementById('heroEyebrow').textContent='VGV vendido · Jan–Jul 2026'+(rot.length?' · '+rot.join(' · '):'');
+
+  document.getElementById('heroValue').textContent=fmt(A.vgv);
+  var pw=document.getElementById('heroPctWrap');
+  if(meta){
+    pw.innerHTML='da meta <b>'+dec(A.vgv/meta*100)+'%</b>';
+  }else{
+    pw.innerHTML='<span class="hint" tabindex="0" data-tip="'+ATT(TIP({t:'Meta neste recorte',
+      rows:[['VGV do recorte',mi(A.vgv)],['VGV total da empresa',mi(VGV_EMPRESA)],
+            ['Participação',dec(VGV_EMPRESA?A.vgv/VGV_EMPRESA*100:0)+'%']],
+      n:'As metas são definidas por corretor, não por bairro, tipo ou faixa de preço. Como não existe meta oficial para este recorte, o painel mostra a participação no VGV em vez de inventar um rateio.'}))+
+      '">participação no VGV <b>'+dec(VGV_EMPRESA?A.vgv/VGV_EMPRESA*100:0)+'%</b></span>';
+  }
+
+  var fill=document.getElementById('railFill'),gapEl=document.getElementById('railGap'),
+      mts=document.getElementById('railMonths'),hits=document.getElementById('railHits');
+  fill.innerHTML='';mts.innerHTML='';hits.innerHTML='';
+  var denom=meta||A.vgv||1;
+  var pct=Math.min(A.vgv/denom*100,100);
+  gapEl.style.width=(100-pct)+'%';
+  var acc=0,antP=0;
+  MESES.forEach(function(m,i){
+    acc+=A.porMes[i];
+    var p=Math.min(acc/denom*100,100);
+    if(i<6){var s=document.createElement('div');s.className='rail-seg';s.style.left=p+'%';fill.appendChild(s)}
+    var l=document.createElement('div');l.className='mk';l.style.left=p+'%';l.textContent=m;mts.appendChild(l);
+    var h=document.createElement('i');h.style.left=antP+'%';h.style.width=Math.max(p-antP,0)+'%';
+    h.setAttribute('tabindex','0');
+    h.dataset.tip=TIP({t:MES_NOME[i]+' de 2026',big:mi(A.porMes[i]),
+      rows:[['Vendas fechadas',fmt(A.qtdMes[i])],
+            ['Ticket médio',A.qtdMes[i]?RS(A.porMes[i]/A.qtdMes[i]):'—'],
+            ['Comissão do mês',RS(A.porMes[i]*COMISSAO)],
+            ['Acumulado no ano',mi(acc)],
+            meta?['% da meta',dec(acc/meta*100)+'%']:null]});
+    hits.appendChild(h);antP=p;
+  });
+  var gapV=meta?meta-A.vgv:0;
+  document.getElementById('metaLbl').textContent=meta?mi(meta):'—';
+  document.getElementById('gapLbl').innerHTML=!meta?'sem meta para este recorte'
+    :(gapV>0?'faltam <b class="num">'+mi(gapV)+'</b>':'superou em <b class="num">'+mi(-gapV)+'</b>');
+  document.getElementById('metaTip').dataset.tip=TIP({t:'Meta do recorte',
+    rows:meta?[['Metas somadas',mi(meta)],['Realizado',mi(A.vgv)],
+      [gapV>0?'Falta':'Excedente',mi(Math.abs(gapV))],
+      ['Ritmo necessário',gapV>0?RS(gapV/5)+' por mês até dezembro':'meta anual já batida']]
+      :[['VGV do recorte',mi(A.vgv)]],
+    n:meta?'Soma das metas anuais dos corretores no recorte.'
+      :'Não há meta definida por bairro, tipo ou faixa de preço.'});
+  requestAnimationFrame(function(){fill.style.width=pct+'%'});
+
+  document.getElementById('dCom').innerHTML=mi(A.com)+'<small>'+dec(COMISSAO*100)+'% médio</small>';
+  document.getElementById('dVendas').innerHTML=fmt(A.n)+'<small>'+dec(A.n/7)+' por mês</small>';
+  var bm=A.porMes.map(function(v,i){return [v,i]}).sort(function(a,b){return b[0]-a[0]})[0];
+  document.getElementById('dMelhor').innerHTML=(bm&&bm[0])?mi(bm[0])+'<small>'+MESES[bm[1]]+'</small>':'—';
+
+  /* KPIs */
+  var precoAnunciado=A.V.reduce(function(a,i){return a+i.preco},0);
+  document.getElementById('kTicket').textContent=A.n?RS(A.ticket):'—';
+  document.getElementById('kTicketF').innerHTML='<b>'+fmt(A.n)+'</b> vendas no período'+
+    '<span class="spark"><i style="width:'+Math.min(A.ticket/1400000*100,100)+'%"></i></span>';
+  document.getElementById('kTempo').innerHTML=A.n?fmt(A.tmv)+'<small> dias</small>':'—';
+  document.getElementById('kTempoF').innerHTML='<b class="'+(A.tmv<=150?'up':'down')+'">'+
+    (A.tmv<=150?'dentro':'acima')+'</b> da meta de 150 dias'+
+    '<span class="spark"><i style="width:'+Math.min(A.tmv/300*100,100)+'%"></i></span>';
+  document.getElementById('kDesc').innerHTML=A.n?dec(A.descM*100)+'<small>%</small>':'—';
+  document.getElementById('kDescF').innerHTML='<b class="'+(A.descM<=0.08?'up':'down')+'">'+
+    RS(precoAnunciado-A.vgv)+'</b> abatidos na mesa'+
+    '<span class="spark"><i style="width:'+Math.min(A.descM*100/15*100,100)+'%"></i></span>';
+  document.getElementById('kConv').innerHTML=dec(A.conv)+'<small>%</small>';
+  document.getElementById('kConvF').innerHTML='<b>'+fmt(A.visitas)+'</b> visitas no período'+
+    '<span class="spark"><i style="width:'+Math.min(A.conv/12*100,100)+'%"></i></span>';
+
+  document.getElementById('kTicketL').dataset.tip=TIP({t:'Ticket médio',big:A.n?RS(A.ticket):'—',
+    rows:[['VGV vendido',mi(A.vgv)],['Vendas',fmt(A.n)],
+          ['Maior venda',A.V.length?RS(Math.max.apply(null,A.V.map(function(i){return i.precoVenda}))):'—'],
+          ['Menor venda',A.V.length?RS(Math.min.apply(null,A.V.map(function(i){return i.precoVenda}))):'—']],
+    n:'VGV dividido pelo número de contratos assinados no período.'});
+  document.getElementById('kTempoL').dataset.tip=TIP({t:'Tempo médio de venda',big:A.n?fmt(A.tmv)+' dias':'—',
+    rows:[['Meta interna','150 dias'],
+          ['Venda mais rápida',A.V.length?fmt(Math.min.apply(null,A.V.map(function(i){return i.dias})))+' dias':'—'],
+          ['Venda mais lenta',A.V.length?fmt(Math.max.apply(null,A.V.map(function(i){return i.dias})))+' dias':'—'],
+          ['Estoque parado hoje',A.E.length?fmt(A.E.reduce(function(a,i){return a+i.dias},0)/A.E.length)+' dias em média':'—']],
+    n:'Dias entre a captação e a assinatura. Só entram imóveis já vendidos — o que está encalhado não puxa esta média.'});
+  document.getElementById('kDescL').dataset.tip=TIP({t:'Desconto na negociação',big:A.n?dec(A.descM*100)+'%':'—',
+    rows:[['Preço de anúncio somado',mi(precoAnunciado)],['Preço de fechamento',mi(A.vgv)],
+          ['Diferença',RS(precoAnunciado-A.vgv)],
+          ['Vendas acima de 12%',fmt(A.V.filter(function(i){return i.desconto>0.12}).length)],
+          ['Comissão perdida',RS((precoAnunciado-A.vgv)*COMISSAO)]],
+    n:'Quanto o preço caiu entre o anúncio e a assinatura. Cada ponto de desconto sai direto da comissão da casa.'});
+  document.getElementById('kConvL').dataset.tip=TIP({t:'Conversão visita → venda',big:dec(A.conv)+'%',
+    rows:[['Visitas realizadas',fmt(A.visitas)],['Propostas registradas',fmt(A.propostas)],
+          ['Vendas fechadas',fmt(A.n)],['Visitas por venda',A.n?dec(A.visitas/A.n):'—']],
+    n:'Inclui visitas em imóveis que ainda não venderam. Por isso o número é baixo: mede o esforço total, não só o das vendas concluídas.'});
+
+  drawComb();drawMensal(meta);drawFunil();drawRank(meta);drawTipos();drawBairros();drawAlertas();
+  page=1;drawTable();
+}
+
+/* ---- régua de estoque ---- */
+var MAXD=540;
+function drawComb(){
+  var comb=document.getElementById('comb'),ax=document.getElementById('combAxis');
+  comb.innerHTML='';ax.innerHTML='';
+  var acc=0;
+  IDADES.forEach(function(f){
+    var w=(Math.min(f.max,MAXD)-Math.max(f.min-1,0))/MAXD*100;
+    var b=document.createElement('div');
+    b.className='comb-band'+(F.idade===f.k?' sel':'');
+    b.style.left=acc+'%';b.style.width=w+'%';b.setAttribute('tabindex','0');
+    var d=A.estIdade[f.k]||{n:0,v:0,dias:0};
+    b.dataset.tip=TIP({t:f.l+' em carteira',big:fmt(d.n)+' imóveis',
+      rows:[['Valor pedido',mi(d.v)],['Ticket médio',d.n?RS(d.v/d.n):'—'],
+            ['Tempo médio',d.n?fmt(d.dias/d.n)+' dias':'—'],
+            ['Participação',A.E.length?dec(d.n/A.E.length*100)+'% da carteira':'—']],
+      n:'Clique para filtrar o painel inteiro por esta faixa.'});
+    b.onclick=(function(k){return function(){setIdade(F.idade===k?'':k)}})(f.k);
+    comb.appendChild(b);acc+=w;
+  });
+  var maxP=Math.max.apply(null,A.E.map(function(i){return i.preco}).concat([1]));
+  A.E.forEach(function(im){
+    var d=Math.min(im.dias,MAXD);
+    var t=document.createElement('i');t.className='tick';
+    t.style.left='calc('+(d/MAXD*100)+'% - 1px)';
+    t.style.height=(22+Math.pow(im.preco/maxP,.55)*62)+'%';
+    t.style.background=IDADE_BY[idadeDe(im.dias)].cor;
+    t.style.opacity=(F.idade&&idadeDe(im.dias)!==F.idade)?.16:.7;
+    comb.appendChild(t);
+  });
+  [0,90,180,270,360,450,540].forEach(function(d){
+    var s=document.createElement('span');s.style.left=(d/MAXD*100)+'%';
+    s.textContent=d===540?'540+':d;ax.appendChild(s);
+  });
+  var bd=document.getElementById('bands');bd.innerHTML='';
+  IDADES.forEach(function(f){
+    var d=A.estIdade[f.k]||{n:0,v:0,dias:0};
+    var e=document.createElement('div');
+    e.className='band'+(F.idade===f.k?' sel':'');
+    e.setAttribute('tabindex','0');
+    e.dataset.tip=TIP({t:f.l+' · '+f.curto,big:fmt(d.n)+' imóveis',
+      rows:[['Valor pedido',mi(d.v)],['Ticket médio',d.n?RS(d.v/d.n):'—'],
+            ['Comissão potencial',RS(d.v*COMISSAO)]],
+      n:'Clique para filtrar o painel inteiro por esta faixa.'});
+    e.innerHTML='<div class="lbl"><i class="sw" style="background:'+f.cor+'"></i>'+f.l+'</div>'+
+      '<div class="n num">'+fmt(d.n)+'<small>imóveis</small></div>'+
+      '<div class="vgv">'+mi(d.v)+' pedidos</div>';
+    e.onclick=(function(k){return function(){setIdade(F.idade===k?'':k)}})(f.k);
+    bd.appendChild(e);
+  });
+}
+function setIdade(k){F.idade=k;render()}
+
+/* ---- gráfico mensal ---- */
+var NS='http://www.w3.org/2000/svg';
+function svgEl(t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);return e}
+function drawMensal(meta){
+  var svg=document.getElementById('mensal');svg.innerHTML='';
+  var W=900,H=250,L=64,Rp=12,T=12,B=26,pw=W-L-Rp,ph=H-T-B;
+  var data=modo==='vgv'?A.porMes:A.qtdMes;
+  var metaMes=meta?(modo==='vgv'?meta/7:(A.n?meta/7/(A.vgv/A.n):0)):0;
+  var raw=Math.max.apply(null,data.concat([metaMes,1]));
+  var step=Math.pow(10,Math.floor(Math.log10(raw)))/2;
+  var max=Math.ceil(raw/step)*step;
+  function y(v){return T+ph-(v/max)*ph}
+  for(var v=0;v<=max+.001;v+=step){
+    svg.appendChild(svgEl('line',{'class':'gl',x1:L,x2:W-Rp,y1:y(v),y2:y(v)}));
+    var t=svgEl('text',{'class':'ax',x:L-9,y:y(v)+3.5,'text-anchor':'end'});
+    t.textContent=modo==='vgv'?(v?fmt(v/1000000)+' mi':'0'):fmt(v);
+    svg.appendChild(t);
+  }
+  var band=pw/7,bw=Math.min(48,band-26);
+  MESES.forEach(function(m,i){
+    var x=L+band*i+(band-bw)/2;
+    var bar=svgEl('rect',{'class':'bar'+(metaMes&&data[i]>=metaMes?' hi':''),x:x,width:bw,y:T+ph,height:0,rx:1.5,id:'b'+i});
+    bar.style.transitionDelay=(i*40)+'ms';svg.appendChild(bar);
+    (function(bar,val){requestAnimationFrame(function(){
+      bar.setAttribute('y',y(val));bar.setAttribute('height',T+ph-y(val))})})(bar,data[i]);
+    var lab=svgEl('text',{'class':'ax',x:L+band*i+band/2,y:H-8,'text-anchor':'middle'});
+    lab.textContent=m;svg.appendChild(lab);
+    var dif=metaMes?(data[i]/metaMes-1)*100:0;
+    var hit=svgEl('rect',{x:L+band*i,width:band,y:T,height:ph,fill:'transparent','data-tip-anchor':'#b'+i,
+      tabindex:'0','data-tip':TIP({t:MES_NOME[i],
+        big:modo==='vgv'?mi(A.porMes[i]):fmt(A.qtdMes[i])+' vendas',
+        rows:[[modo==='vgv'?'Vendas':'VGV',modo==='vgv'?fmt(A.qtdMes[i]):mi(A.porMes[i])],
+              ['Ticket médio',A.qtdMes[i]?RS(A.porMes[i]/A.qtdMes[i]):'—'],
+              ['Comissão',RS(A.porMes[i]*COMISSAO)],
+              metaMes?['Meta do mês',modo==='vgv'?mi(metaMes):fmt(Math.round(metaMes))+' vendas']:null,
+              metaMes?['Diferença',(dif>=0?'+':'−')+dec(Math.abs(dif))+'%']:null]})});
+    hit.addEventListener('mouseenter',function(){bar.classList.add('on')});
+    hit.addEventListener('mouseleave',function(){bar.classList.remove('on')});
+    svg.appendChild(hit);
+  });
+  if(metaMes>0&&metaMes<=max){
+    svg.appendChild(svgEl('line',{'class':'meta-line',x1:L,x2:W-Rp,y1:y(metaMes),y2:y(metaMes)}));
+    var ml=svgEl('text',{'class':'ax',x:W-Rp,y:y(metaMes)-6,'text-anchor':'end'});
+    ml.textContent='meta mensal '+(modo==='vgv'?mi(metaMes):fmt(Math.round(metaMes))+' vendas');
+    svg.appendChild(ml);
+  }
+}
+document.getElementById('btnVgv').onclick=function(){modo='vgv';tg();drawMensal(metaEscopo())};
+document.getElementById('btnQtd').onclick=function(){modo='qtd';tg();drawMensal(metaEscopo())};
+function tg(){document.getElementById('btnVgv').setAttribute('aria-pressed',modo==='vgv');
+  document.getElementById('btnQtd').setAttribute('aria-pressed',modo==='qtd')}
+
+/* ---- funil ---- */
+function drawFunil(){
+  var ul=document.getElementById('funil');
+  var st=[{l:'Visitas',v:A.visitas,c:''},{l:'Propostas',v:A.propostas,c:'s2'},{l:'Vendas',v:A.n,c:'s3'}];
+  var max=st[0].v||1,html='';
+  st.forEach(function(s,i){
+    html+='<li tabindex="0" data-tip="'+ATT(TIP({t:s.l,big:fmt(s.v),
+      rows:[['Sobre as visitas',max?dec(s.v/max*100)+'%':'—'],
+            i>0?['Vindo da etapa anterior',st[i-1].v?dec(s.v/st[i-1].v*100)+'%':'—']:null,
+            ['Por venda fechada',A.n?dec(s.v/A.n)+'×':'—']],
+      n:i===0?'Visitas acompanhadas por corretor e registradas no CRM, em imóveis vendidos e ainda em carteira.'
+        :i===1?'Propostas formais registradas. Uma proposta recusada e renegociada conta duas vezes.'
+        :'Contratos de compra e venda assinados no período.'}))+'">'+
+      '<span class="stage">'+s.l+'</span>'+
+      '<span class="barw"><i class="'+s.c+'" data-w="'+(s.v/max*100)+'"></i></span>'+
+      '<span class="n">'+fmt(s.v)+'</span></li>';
+    if(i<st.length-1)html+='<div class="conv">→ <b>'+(st[i].v?dec(st[i+1].v/st[i].v*100):'0,0')+'%</b> avançam</div>';
+  });
+  ul.innerHTML=html;
+  requestAnimationFrame(function(){
+    ul.querySelectorAll('i[data-w]').forEach(function(i){i.style.width=i.dataset.w+'%'})});
+}
+
+/* ---- ranking ---- */
+function drawRank(meta){
+  var tb=document.getElementById('rankBody');tb.innerHTML='';
+  var semMeta=!!(F.bairro||F.tipo||F.faixa||F.idade);
+  var lista=CORR.filter(function(c){return !F.corr||c.id==F.corr}).map(function(c){
+    var d=A.porCorr[c.id]||{vgv:0,n:0,com:0,dias:0,desc:0};
+    var cap=IMOVEIS.filter(function(i){return i.captador===c.id&&base(i)}).length;
+    return{id:c.id,nome:c.nome,meta:c.meta,vgv:d.vgv,n:d.n,com:d.com,cap:cap,
+      at:semMeta?null:(c.meta?d.vgv/c.meta*100:0),
+      tmv:d.n?d.dias/d.n:0,descM:d.n?d.desc/d.n:0};
+  }).sort(function(a,b){return b.vgv-a.vgv});
+  lista.forEach(function(c){
+    var ini=c.nome.split(' ').map(function(s){return s[0]}).slice(0,2).join('');
+    var cls=c.at==null?'':(c.at>=100?'over':(c.at<90?'under':''));
+    var tr=document.createElement('tr');tr.style.cursor='pointer';tr.setAttribute('tabindex','0');
+    tr.dataset.tip=TIP({t:c.nome,big:mi(c.vgv),
+      rows:[c.at!=null?['Meta do período',mi(c.meta)]:null,
+            c.at!=null?[c.vgv>=c.meta?'Excedente':'Falta',mi(Math.abs(c.meta-c.vgv))]:null,
+            c.at!=null?['Atingimento',dec(c.at)+'%']:null,
+            ['Vendas fechadas',fmt(c.n)],['Ticket médio',c.n?RS(c.vgv/c.n):'—'],
+            ['Tempo médio de venda',c.n?fmt(c.tmv)+' dias':'—'],
+            ['Desconto médio',c.n?dec(c.descM*100)+'%':'—'],
+            ['Comissão gerada',RS(c.com)],['Imóveis captados',fmt(c.cap)]],
+      n:c.at==null?'Sem meta oficial para este recorte — o atingimento fica oculto.'
+        :'Clique na linha para filtrar o painel por este corretor.'});
+    tr.innerHTML='<td><div class="who"><span class="av">'+ini+'</span><div><div>'+c.nome+'</div>'+
+      '<div class="sec">'+fmt(c.n)+' venda'+(c.n===1?'':'s')+' · '+(c.n?fmt(c.tmv)+' dias':'—')+'</div></div></div></td>'+
+      '<td class="r mono">'+mi(c.vgv)+'</td>'+
+      '<td class="r mono">'+(A.vgv?dec(c.vgv/A.vgv*100):'0,0')+'%</td>'+
+      '<td class="r">'+(c.at==null?'<span class="muted">—</span>':
+        '<div class="metacell"><span class="mono">'+Math.round(c.at)+'%</span>'+
+        '<span class="metabar"><i class="'+cls+'" style="width:'+Math.min(c.at,120)/1.2+'%"></i>'+
+        '<span class="metatick" style="left:83.3%"></span></span></div>')+'</td>'+
+      '<td class="r mono">'+fmt(c.n)+'</td><td class="r mono">'+fmt(c.cap)+'</td>'+
+      '<td class="r mono">'+RS(c.com)+'</td>';
+    tr.onclick=(function(id){return function(){F.corr=(F.corr==id)?'':String(id);sync();render()}})(c.id);
+    tb.appendChild(tr);
+  });
+  var capT=IMOVEIS.filter(function(i){return base(i)&&(!F.corr||i.captador==F.corr)}).length;
+  var tr=document.createElement('tr');tr.className='total';
+  tr.innerHTML='<td>Total · '+lista.length+' corretor'+(lista.length>1?'es':'')+'</td>'+
+    '<td class="r mono">'+mi(A.vgv)+'</td><td class="r mono">100,0%</td>'+
+    '<td class="r mono">'+(meta?dec(A.vgv/meta*100)+'%':'—')+'</td>'+
+    '<td class="r mono">'+fmt(A.n)+'</td><td class="r mono">'+fmt(capT)+'</td>'+
+    '<td class="r mono">'+RS(A.com)+'</td>';
+  tb.appendChild(tr);
+}
+
+/* ---- tipos ---- */
+function drawTipos(){
+  var ul=document.getElementById('tipos');ul.innerHTML='';
+  var dados=Object.keys(TIPOS).map(function(t){return{n:t,v:A.porTipo[t]||0}})
+    .sort(function(a,b){return b.v-a.v});
+  var max=dados[0]?dados[0].v:1;
+  var soma=dados.reduce(function(a,b){return a+b.v},0)||1;
+  dados.forEach(function(t){
+    var vend=A.V.filter(function(i){return i.tipo===t.n});
+    var est=A.E.filter(function(i){return i.tipo===t.n});
+    var li=document.createElement('li');li.setAttribute('tabindex','0');
+    li.dataset.tip=TIP({t:t.n,big:mi(t.v),
+      rows:[['Participação no VGV',dec(t.v/soma*100)+'%'],['Vendas',fmt(vend.length)],
+            ['Ticket médio',vend.length?RS(t.v/vend.length):'—'],
+            ['Tempo médio',vend.length?fmt(vend.reduce(function(a,i){return a+i.dias},0)/vend.length)+' dias':'—'],
+            ['Em carteira',fmt(est.length)+' imóveis'],
+            ['Parado em estoque',mi(est.reduce(function(a,i){return a+i.preco},0))]],
+      n:'Clique para filtrar o painel por este tipo.'});
+    li.innerHTML='<div class="row"><span class="nm">'+t.n+'</span>'+
+      '<span class="val">'+mi(t.v)+'</span><span class="pc">'+dec(t.v/soma*100)+'%</span></div>'+
+      '<div class="track"><i style="width:'+(max?t.v/max*100:0)+'%"></i></div>';
+    li.onclick=(function(n){return function(){F.tipo=F.tipo===n?'':n;sync();render()}})(t.n);
+    ul.appendChild(li);
+  });
+}
+
+/* ---- bairros ---- */
+function drawBairros(){
+  var w=document.getElementById('bairros');w.innerHTML='';
+  var top=Object.keys(A.porBairro).map(function(b){return [b,A.porBairro[b]]})
+    .sort(function(a,b){return b[1]-a[1]}).slice(0,6);
+  if(!top.length){w.innerHTML='<div class="muted" style="padding:6px 0">Nenhuma venda neste recorte.</div>';return}
+  top.forEach(function(p){
+    var b=p[0],v=p[1],est=A.estBairro[b]||0,total=v+est,giro=total?v/total*100:0;
+    var vend=A.V.filter(function(i){return i.bairro===b});
+    var eL=A.E.filter(function(i){return i.bairro===b});
+    var d=document.createElement('div');d.className='bairro';d.setAttribute('tabindex','0');
+    d.dataset.tip=TIP({t:b,big:mi(v),
+      rows:[['Vendas',fmt(vend.length)],['Ticket médio',vend.length?RS(v/vend.length):'—'],
+            ['Tempo médio',vend.length?fmt(vend.reduce(function(a,i){return a+i.dias},0)/vend.length)+' dias':'—'],
+            ['Parado em estoque',mi(est)+' · '+fmt(eL.length)+' imóveis'],
+            ['Giro',dec(giro)+'% do valor girou'],
+            ['Desconto médio',vend.length?dec(vend.reduce(function(a,i){return a+i.desconto},0)/vend.length*100)+'%':'—']],
+      n:'Giro é quanto do valor ligado ao bairro já virou venda, contra o que segue parado em carteira.'});
+    d.innerHTML='<div class="nm">'+b+'</div><div class="v num">'+mi(v)+'</div>'+
+      '<div class="meta"><span class="track"><i style="width:'+giro+'%;background:'+
+      (giro<35?'var(--amber)':'var(--blue-2)')+'"></i></span><span class="mono">'+Math.round(giro)+'% giro</span></div>';
+    d.onclick=(function(n){return function(){F.bairro=F.bairro===n?'':n;sync();render()}})(b);
+    w.appendChild(d);
+  });
+}
+
+/* ---- alertas ---- */
+function drawAlertas(){
+  var parados=A.E.filter(function(i){return i.dias>180});
+  var vParado=parados.reduce(function(a,i){return a+i.preco},0);
+  var semVisita=A.E.filter(function(i){return i.dias>60&&(i.visitas===0||(i.ultVisita!==null&&i.ultVisita>60))});
+  var negParada=A.E.filter(function(i){return i.status==='Em negociação'&&i.dias>150});
+  var descAlto=A.V.filter(function(i){return i.desconto>0.12});
+  var perda=descAlto.reduce(function(a,i){return a+(i.preco-i.precoVenda)},0);
+  var itens=[
+    {c:'hi',t:'Imóveis parados há mais de 6 meses',d:fmt(parados.length)+' de '+fmt(A.E.length)+' em carteira',n:mi(vParado),
+     tip:TIP({t:'Imóveis parados há mais de 6 meses',big:fmt(parados.length)+' imóveis',
+       rows:[['Valor pedido',mi(vParado)],['Comissão travada',RS(vParado*COMISSAO)],
+             ['Média em carteira',parados.length?fmt(parados.reduce(function(a,i){return a+i.dias},0)/parados.length)+' dias':'—'],
+             ['Sem nenhuma visita',fmt(parados.filter(function(i){return i.visitas===0}).length)]],
+       n:'Critério: mais de 180 dias desde a captação, sem contrato assinado. O caminho normal aqui é revisar preço ou devolver a exclusividade.'})},
+    {c:'hi',t:'Sem visita nos últimos 60 dias',d:'Imóveis captados há mais de 2 meses',n:fmt(semVisita.length)+' imóveis',
+     tip:TIP({t:'Sem visita nos últimos 60 dias',big:fmt(semVisita.length)+' imóveis',
+       rows:[['Valor pedido',mi(semVisita.reduce(function(a,i){return a+i.preco},0))],
+             ['Tempo médio em carteira',semVisita.length?fmt(semVisita.reduce(function(a,i){return a+i.dias},0)/semVisita.length)+' dias':'—']],
+       n:'Critério: nenhuma visita registrada nos últimos 60 dias, em imóvel captado há mais de 60. Costuma indicar anúncio fraco ou preço fora da faixa.'})},
+    {c:'md',t:'Negociações abertas há muito tempo',d:'Em negociação há mais de 150 dias',n:fmt(negParada.length)+' casos',
+     tip:TIP({t:'Negociações abertas há muito tempo',big:fmt(negParada.length)+' casos',
+       rows:[['Valor envolvido',mi(negParada.reduce(function(a,i){return a+i.preco},0))],
+             ['Comissão em risco',RS(negParada.reduce(function(a,i){return a+i.preco},0)*COMISSAO)]],
+       n:'Critério: imóvel marcado como em negociação e captado há mais de 150 dias. Vale confirmar se a proposta ainda está de pé.'})},
+    {c:'md',t:'Vendas com desconto acima de 12%',d:'Teto aprovado pela diretoria é 12%',n:fmt(descAlto.length)+' vendas',
+     tip:TIP({t:'Vendas com desconto acima de 12%',big:fmt(descAlto.length)+' vendas',
+       rows:[['Participação',A.n?dec(descAlto.length/A.n*100)+'% das vendas':'—'],
+             ['Valor abatido',RS(perda)],['Comissão perdida',RS(perda*COMISSAO)],
+             ['Desconto médio no grupo',descAlto.length?dec(descAlto.reduce(function(a,i){return a+i.desconto},0)/descAlto.length*100)+'%':'—']],
+       n:'Critério: diferença entre anúncio e fechamento acima de 12%. Desconto alto em imóvel novo na carteira costuma ser erro de precificação na captação.'})}];
+  document.getElementById('alertas').innerHTML=itens.map(function(i){
+    return '<li tabindex="0" data-tip="'+ATT(i.tip)+'"><i class="tick2 '+i.c+'"></i>'+
+      '<div><div class="t">'+i.t+'</div><div class="d">'+i.d+'</div></div><div class="n">'+i.n+'</div></li>'}).join('');
+}
+
+/* ---- tabela ---- */
+var tab='est',page=1,perPage=10,q='',sortKey='',sortDir=-1;
+var COLS={
+ est:[{k:'ref',l:'Ref.'},{k:'tipo',l:'Tipo'},{k:'bairro',l:'Bairro'},{k:'captador',l:'Captador'},
+      {k:'dias',l:'Em carteira',r:1},{k:'visitas',l:'Visitas',r:1},{k:'preco',l:'Preço pedido',r:1},{k:'status',l:'Situação'}],
+ ven:[{k:'ref',l:'Ref.'},{k:'tipo',l:'Tipo'},{k:'bairro',l:'Bairro'},{k:'vendedor',l:'Vendedor'},
+      {k:'dataVenda',l:'Fechamento',r:1},{k:'dias',l:'Dias até vender',r:1},{k:'preco',l:'Anúncio',r:1},
+      {k:'precoVenda',l:'Venda',r:1},{k:'desconto',l:'Desc.',r:1},{k:'comissao',l:'Comissão',r:1}]};
+
+function linhas(){
+  if(tab==='est')return A.E.map(function(i){
+    var o={};for(var k in i)o[k]=i[k];o.captador=CORR_BY[i.captador].nome;o._im=i;return o});
+  return A.V.map(function(i){
+    var o={};for(var k in i)o[k]=i[k];o.vendedor=CORR_BY[i.vendedor].nome;o._im=i;return o});
+}
+function filtradas(){
+  var r=linhas();
+  if(q){var s=q.toLowerCase();
+    r=r.filter(function(x){return [x.ref,x.tipo,x.bairro,x.captador,x.vendedor,x.status]
+      .filter(Boolean).join(' ').toLowerCase().indexOf(s)>=0})}
+  var k=sortKey||(tab==='est'?'dias':'precoVenda');
+  r.sort(function(a,b){var x=a[k],y=b[k];
+    return typeof x==='string'?x.localeCompare(y,'pt-BR')*sortDir:(x-y)*sortDir});
+  return r;
+}
+function tipLinha(im){
+  var vend=im.status==='Vendido';
+  return TIP({t:im.ref+' · '+im.tipo+' · '+im.bairro,
+    big:vend?RS(im.precoVenda):RS(im.preco),
+    rows:[['Captado por',CORR_BY[im.captador].nome],
+          vend?['Vendido por',CORR_BY[im.vendedor].nome]:null,
+          ['Captação',dataBR(im.captacao)],
+          vend?['Fechamento',dataBR(im.dataVenda)]:['Em carteira',fmt(im.dias)+' dias'],
+          vend?['Dias até vender',fmt(im.dias)]:null,
+          vend?['Preço de anúncio',RS(im.preco)]:null,
+          vend?['Desconto',dec(im.desconto*100)+'%']:null,
+          vend?['Comissão',RS(im.comissao)]:['Comissão potencial',RS(im.preco*COMISSAO)],
+          ['Visitas',fmt(im.visitas)],['Propostas',fmt(im.propostas)],
+          !vend?['Situação',im.status]:null],
+    n:vend?'Valores de fechamento conforme contrato registrado no CRM.'
+      :'Imóvel ainda em carteira. A comissão potencial usa o preço pedido, antes de qualquer negociação.'});
+}
+function cel(c,r){
+  var v=r[c.k];
+  if(c.k==='preco'||c.k==='precoVenda'||c.k==='comissao')return RS(v);
+  if(c.k==='desconto')return dec(v*100)+'%';
+  if(c.k==='dataVenda')return dataBR(v);
+  if(c.k==='dias'&&tab==='est'){var f=IDADE_BY[idadeDe(v)];
+    return '<span class="age"><i style="background:'+f.cor+'"></i>'+fmt(v)+'</span>'}
+  if(c.k==='status')return '<span class="tag'+(v==='Em negociação'?' neg':'')+'">'+v+'</span>';
+  if(typeof v==='number')return fmt(v);
+  return v;
+}
+function drawTable(){
+  var dados=filtradas(),total=dados.length;
+  var pages=Math.max(1,Math.ceil(total/perPage));
+  page=Math.min(page,pages);
+  var slice=dados.slice((page-1)*perPage,page*perPage);
+  var head=document.getElementById('tblHead'),body=document.getElementById('tblBody');
+  var ativo=sortKey||(tab==='est'?'dias':'precoVenda');
+  head.innerHTML='<tr>'+COLS[tab].map(function(c){
+    return '<th class="sortable'+(c.r?' r':'')+(ativo===c.k?' sorted':'')+'" data-k="'+c.k+'">'+
+      c.l+'<span class="ar">'+(sortDir<0?'▼':'▲')+'</span></th>'}).join('')+'</tr>';
+  head.querySelectorAll('th').forEach(function(th){th.onclick=function(){
+    var k=th.dataset.k;
+    if(ativo===k){sortDir*=-1;sortKey=k}
+    else{sortKey=k;sortDir=(['ref','tipo','bairro','captador','vendedor','status'].indexOf(k)>=0)?1:-1}
+    page=1;drawTable()}});
+  body.innerHTML=slice.map(function(r){
+    return '<tr tabindex="0" data-tip="'+ATT(tipLinha(r._im))+'">'+
+      COLS[tab].map(function(c){return '<td class="'+(c.r?'r mono':'')+'">'+cel(c,r)+'</td>'}).join('')+'</tr>'}).join('');
+  document.getElementById('tblEmpty').hidden=total>0;
+  document.getElementById('tbl').style.display=total?'':'none';
+  document.getElementById('tblCount').textContent=total
+    ?fmt((page-1)*perPage+1)+'–'+fmt(Math.min(page*perPage,total))+' de '+fmt(total)+(tab==='est'?' em carteira':' vendas'):'';
+  document.getElementById('pageLbl').textContent=total?page+' / '+pages:'';
+  document.getElementById('prev').disabled=page<=1;
+  document.getElementById('next').disabled=page>=pages;
+  document.getElementById('tblHint').textContent='Clique nos títulos para ordenar';
+}
+document.getElementById('prev').onclick=function(){page--;drawTable()};
+document.getElementById('next').onclick=function(){page++;drawTable()};
+document.getElementById('q').addEventListener('input',function(e){q=e.target.value;page=1;drawTable()});
+document.getElementById('tabEst').onclick=function(){swTab('est')};
+document.getElementById('tabVen').onclick=function(){swTab('ven')};
+function swTab(t){tab=t;page=1;sortKey='';sortDir=-1;
+  document.getElementById('tabEst').setAttribute('aria-selected',t==='est');
+  document.getElementById('tabVen').setAttribute('aria-selected',t==='ven');drawTable()}
+
+document.getElementById('btnCsv').onclick=function(){
+  var dados=filtradas();
+  var txt=[COLS[tab].map(function(c){return c.l}).join(';')].concat(
+    dados.map(function(r){return COLS[tab].map(function(c){
+      var v=r[c.k];
+      if(c.k==='dataVenda')return dataBR(v);
+      if(c.k==='desconto')return dec(v*100);
+      return typeof v==='number'?String(Math.round(v*100)/100).replace('.',','):v}).join(';')})).join('\n');
+  function ok(){toast(fmt(dados.length)+' linhas copiadas')}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(ok,fallback);
+  }else fallback();
+  function fallback(){
+    var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');ok()}catch(e){toast('Não foi possível copiar neste navegador')}
+    ta.remove();
+  }
+};
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');
+  clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on')},2000)}
+
+/* ---- selects ---- */
+function opt(id,vals,cur){var s=document.getElementById(id),first=s.options[0].outerHTML;
+  s.innerHTML=first+vals.map(function(v){
+    return '<option value="'+v.v+'"'+(String(cur)===String(v.v)?' selected':'')+'>'+v.l+'</option>'}).join('')}
+function sync(){
+  opt('fCorr',CORR.map(function(c){return{v:c.id,l:c.nome}}),F.corr);
+  opt('fBairro',Object.keys(BAIRROS).sort(function(a,b){return a.localeCompare(b,'pt-BR')})
+    .map(function(b){return{v:b,l:b}}),F.bairro);
+  opt('fTipo',Object.keys(TIPOS).map(function(t){return{v:t,l:t}}),F.tipo);
+  opt('fFaixa',FAIXAS.map(function(f){return{v:f.k,l:f.l}}),F.faixa);
+}
+document.getElementById('fCorr').onchange=function(e){F.corr=e.target.value;render()};
+document.getElementById('fBairro').onchange=function(e){F.bairro=e.target.value;render()};
+document.getElementById('fTipo').onchange=function(e){F.tipo=e.target.value;render()};
+document.getElementById('fFaixa').onchange=function(e){F.faixa=e.target.value;render()};
+document.getElementById('btnClear').onclick=function(){clearAll()};
+document.getElementById('btnEmpty').onclick=function(){clearAll()};
+function clearAll(){F.corr='';F.bairro='';F.tipo='';F.faixa='';F.idade='';
+  q='';document.getElementById('q').value='';sync();render()}
+
+sync();render();
+</script>
+</body>
+</html>
